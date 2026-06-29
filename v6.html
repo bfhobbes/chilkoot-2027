@@ -1050,7 +1050,6 @@ function goTo(n) {
   slides[cur].classList.add('active');
   allDots[cur].classList.add('active');
   ctrEl.textContent = (cur + 1) + ' / ' + total;
-  localStorage.setItem('chilkoot_cur', cur);
   startReveal(slides[cur]);
 }
 
@@ -1128,16 +1127,6 @@ document.querySelectorAll('.preset-btn').forEach(b => {
     parseInt(b.dataset.title) === titleDelay && parseInt(b.dataset.body) === bodyDelay);
 });
 
-// Restore saved slide (no transition animation — just snap to position)
-const savedSlide = Math.min(parseInt(localStorage.getItem('chilkoot_cur') ?? '0'), total - 1);
-if (savedSlide > 0) {
-  slides[0].classList.remove('active');
-  dotsEl.querySelectorAll('.dot')[0].classList.remove('active');
-  cur = savedSlide;
-  slides[cur].classList.add('active');
-  dotsEl.querySelectorAll('.dot')[cur].classList.add('active');
-  ctrEl.textContent = (cur + 1) + ' / ' + total;
-}
 startReveal(slides[cur]);
 </script>
 </body>
