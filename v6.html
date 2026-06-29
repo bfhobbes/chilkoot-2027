@@ -1009,9 +1009,9 @@ const dotsEl = document.getElementById('dots');
 const total  = slides.length;
 let cur = 0;
 
-// ── Reveal timing ──
-let titleDelay = 1500;
-let bodyDelay  = 900;
+// ── Reveal timing (persisted) ──
+let titleDelay = parseInt(localStorage.getItem('chilkoot_titleDelay') ?? '1500');
+let bodyDelay  = parseInt(localStorage.getItem('chilkoot_bodyDelay')  ?? '900');
 let revealTimers = [];
 
 slides.forEach((_, i) => {
@@ -1050,6 +1050,7 @@ function goTo(n) {
   slides[cur].classList.add('active');
   allDots[cur].classList.add('active');
   ctrEl.textContent = (cur + 1) + ' / ' + total;
+  localStorage.setItem('chilkoot_cur', cur);
   startReveal(slides[cur]);
 }
 
@@ -1089,11 +1090,13 @@ function fmtDelay(ms) { return ms === 0 ? 'off' : (ms / 1000).toFixed(1) + 's'; 
 sTitleSlider.addEventListener('input', () => {
   titleDelay = parseInt(sTitleSlider.value);
   sTitleVal.textContent = fmtDelay(titleDelay);
+  localStorage.setItem('chilkoot_titleDelay', titleDelay);
   document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
 });
 sBodySlider.addEventListener('input', () => {
   bodyDelay = parseInt(sBodySlider.value);
   sBodyVal.textContent = fmtDelay(bodyDelay);
+  localStorage.setItem('chilkoot_bodyDelay', bodyDelay);
   document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
 });
 
@@ -1107,13 +1110,35 @@ document.querySelectorAll('.preset-btn').forEach(btn => {
     sTitleVal.textContent = fmtDelay(titleDelay);
     sBodyVal.textContent  = fmtDelay(bodyDelay);
     document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+    localStorage.setItem('chilkoot_titleDelay', titleDelay);
+    localStorage.setItem('chilkoot_bodyDelay', bodyDelay);
     btn.classList.add('active');
     startReveal(slides[cur]);
   });
 });
 
-// Kick off first slide
-startReveal(slides[0]);
+// ── Restore persisted state ──
+// Sync sliders and labels to loaded values
+sTitleSlider.value = titleDelay;
+sBodySlider.value  = bodyDelay;
+sTitleVal.textContent = fmtDelay(titleDelay);
+sBodyVal.textContent  = fmtDelay(bodyDelay);
+document.querySelectorAll('.preset-btn').forEach(b => {
+  b.classList.toggle('active',
+    parseInt(b.dataset.title) === titleDelay && parseInt(b.dataset.body) === bodyDelay);
+});
+
+// Restore saved slide (no transition animation — just snap to position)
+const savedSlide = Math.min(parseInt(localStorage.getItem('chilkoot_cur') ?? '0'), total - 1);
+if (savedSlide > 0) {
+  slides[0].classList.remove('active');
+  dotsEl.querySelectorAll('.dot')[0].classList.remove('active');
+  cur = savedSlide;
+  slides[cur].classList.add('active');
+  dotsEl.querySelectorAll('.dot')[cur].classList.add('active');
+  ctrEl.textContent = (cur + 1) + ' / ' + total;
+}
+startReveal(slides[cur]);
 </script>
 </body>
 </html>
