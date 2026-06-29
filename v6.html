@@ -423,6 +423,11 @@ h2 {
 .itin-split .act-desc { display: none; }
 
 /* ─── STAGED CONTENT REVEAL ─── */
+/* Overlay starts invisible so background image is full brightness */
+.slide .ov { opacity: 0; transition: opacity 0.65s ease; }
+/* Overlay dims in sync with the title appearing */
+.slide.reveal-title .ov { opacity: 1; }
+
 .slide .content > * {
   opacity: 0;
   transform: translateY(10px);
