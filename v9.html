@@ -553,6 +553,12 @@ h2 {
       <input type="range" id="s-body" min="0" max="3000" step="100" value="900">
       <span id="s-body-v">0.9s</span>
     </div>
+    <div class="stg-title" style="margin-top:0.9rem;">Photo Gallery</div>
+    <div class="stg-row">
+      <label>Photo cycle every</label>
+      <input type="range" id="s-gallery" min="1500" max="8000" step="500" value="4000">
+      <span id="s-gallery-v">4.0s</span>
+    </div>
   </div>
 </div>
 
@@ -1163,6 +1169,7 @@ const galleryDotsWrap = document.getElementById('gallery-dots');
 const galleryCaptionEl = document.getElementById('gallery-caption');
 let galleryTimer = null;
 let galleryIdx = 0;
+let galleryInterval = parseInt(localStorage.getItem('chilkoot_galleryInterval') ?? '4000');
 
 galleryPhotos.forEach((_, i) => {
   const d = document.createElement('div');
@@ -1185,11 +1192,20 @@ function startGallery() {
   showGalleryPhoto(0);
   galleryTimer = setInterval(() => {
     showGalleryPhoto((galleryIdx + 1) % galleryPhotos.length);
-  }, 4000);
+  }, galleryInterval);
 }
 
 function stopGallery() {
   if (galleryTimer) { clearInterval(galleryTimer); galleryTimer = null; }
+}
+
+function restartGalleryTimer() {
+  // Re-apply a changed interval without resetting the current photo
+  if (!galleryTimer) return;
+  clearInterval(galleryTimer);
+  galleryTimer = setInterval(() => {
+    showGalleryPhoto((galleryIdx + 1) % galleryPhotos.length);
+  }, galleryInterval);
 }
 
 document.getElementById('next').addEventListener('click', () => goTo(cur + 1));
@@ -1216,6 +1232,8 @@ const sTitleSlider = document.getElementById('s-title');
 const sBodySlider  = document.getElementById('s-body');
 const sTitleVal    = document.getElementById('s-title-v');
 const sBodyVal     = document.getElementById('s-body-v');
+const sGallerySlider = document.getElementById('s-gallery');
+const sGalleryVal    = document.getElementById('s-gallery-v');
 
 settingsBtn.addEventListener('click', e => {
   e.stopPropagation();
@@ -1236,6 +1254,12 @@ sBodySlider.addEventListener('input', () => {
   sBodyVal.textContent = fmtDelay(bodyDelay);
   localStorage.setItem('chilkoot_bodyDelay', bodyDelay);
   document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+});
+sGallerySlider.addEventListener('input', () => {
+  galleryInterval = parseInt(sGallerySlider.value);
+  sGalleryVal.textContent = (galleryInterval / 1000).toFixed(1) + 's';
+  localStorage.setItem('chilkoot_galleryInterval', galleryInterval);
+  restartGalleryTimer();
 });
 
 document.querySelectorAll('.preset-btn').forEach(btn => {
@@ -1265,6 +1289,8 @@ document.querySelectorAll('.preset-btn').forEach(b => {
   b.classList.toggle('active',
     parseInt(b.dataset.title) === titleDelay && parseInt(b.dataset.body) === bodyDelay);
 });
+sGallerySlider.value = galleryInterval;
+sGalleryVal.textContent = (galleryInterval / 1000).toFixed(1) + 's';
 
 startReveal(slides[cur]);
 syncSlideChrome();
