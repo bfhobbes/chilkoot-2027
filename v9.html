@@ -529,7 +529,7 @@ h2 {
 <div class="dots" id="dots"></div>
 <nav class="nav">
   <button class="nav-btn" id="prev">&#8592;</button>
-  <span class="ctr" id="ctr">1 / 12</span>
+  <span class="ctr" id="ctr">1 / 11</span>
   <button class="nav-btn" id="next">&#8594;</button>
 </nav>
 
@@ -1111,7 +1111,7 @@ slides.forEach((_, i) => {
   d.addEventListener('click', () => goTo(i));
   dotsEl.appendChild(d);
 });
-ctrEl.textContent = '1 / ' + total;
+ctrEl.textContent = '1 / ' + (total - 1);
 
 function startReveal(slide) {
   revealTimers.forEach(clearTimeout);
@@ -1152,7 +1152,7 @@ function goTo(n) {
   cur = ((n % total) + total) % total;
   slides[cur].classList.add('active');
   allDots[cur].classList.add('active');
-  ctrEl.textContent = (cur + 1) + ' / ' + total;
+  ctrEl.textContent = cur + ' / ' + (total - 1);
   startReveal(slides[cur]);
   syncSlideChrome();
 }
